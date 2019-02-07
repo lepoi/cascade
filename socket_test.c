@@ -28,18 +28,18 @@ char dopreprocessing(char *client_addr, char *buffer) {
       if (error = login(body, client_addr))
          return error;
    }
-   
+
    // is it a logout attempt?
    // look for a session and end it
    if (operation == 'O')
       return logout(client_addr);
-   
+
    // is it a login attempt using session?
    // check if username and client_addr match
    if (operation == 'S') {
       return login_session(body, client_addr);
    }
-   
+
    // is it a registration attempt?
    // if user doesn't exist, create record
    //    TODO: store username
@@ -67,7 +67,7 @@ void doprocessing(int sock, char *client_addr) {
    }
 
    if (error = dopreprocessing(client_addr, buffer)) {
-      printf("[ %s ] [ %s ] error: %u", buffer[0], client_addr, error);
+      printf("[ %s ] [ %s ] error: %u", &buffer[0], client_addr, error);
       exit(1);
    }
    

@@ -1,6 +1,6 @@
 char *DB = "clients";
 const size_t USRLEN = 8, PASSLEN = 8, ADDRLEN = 15;
-size_t CLIENTREGLEN = USRLEN + PASSLEN + 1, SESSIONREGLEN = USRLEN + ADDRLEN + 1;
+size_t CLIENTREGLEN = 9, SESSIONREGLEN = 24;
 
 char lookup_user(char *username, char *password) {
 	FILE *db = fopen(DB, "r");
@@ -13,7 +13,7 @@ char lookup_user(char *username, char *password) {
 
 	char *user = calloc(15, 1), *pass;
 
-	if (password == NULL) {		
+	if (password == NULL) {
 		while(getline(&buffer, &CLIENTREGLEN, db) != -1) {
 			sscanf(buffer, "%s;", user);
 			// printf("[user] \"%s\"\n", user);
@@ -45,7 +45,7 @@ char lookup_session(char *username, char *address) {
 	}
 
 	char *user = calloc(15, 1), *addr = calloc(8, 1);
-	while(getline(&buffer, &SESSIONREGLEN, db) != -1) {
+	while (getline(&buffer, &SESSIONREGLEN, db) != -1) {
 		sscanf(buffer, "%s;%s", user, addr);
 		// printf("[user] \"%s\", [addr] \"%s\"\n", user, addr);
 		if (strcmp(username, user) == 0 && strcmp(address, addr) == 0)
