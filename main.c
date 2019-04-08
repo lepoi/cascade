@@ -1,8 +1,9 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "utils.c"
+#include "state.c"
 #include "users.c"
 
 int main(int argc, char *args[]) {
@@ -25,7 +26,7 @@ int main(int argc, char *args[]) {
 	printf("Successfully loaded user databse\n");
 
     // anything else
-    unsigned int a = add_user("poi", "terminal", "terminallyquack@gmail.com");
+    // unsigned int a = add_user("poi??", "terminal??", "terminallyquack@gmail.com??", 0);
 
     return 0;
 }

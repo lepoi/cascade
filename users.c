@@ -8,7 +8,7 @@ char init_user_db() {
 	return 1;
 
     // write empty file to storage
-    fprintf(user_db, "%s", INIT_USER_HEADER);
+    fwrite(INIT_USER_HEADER, USER_HEADER_SIZE, 1, user_db);
     fclose(user_db);
 
     return 0;
@@ -16,65 +16,102 @@ char init_user_db() {
 
 // load into memory
 char load_user_db() {
+    ushort len;
+    char *buffer, active, *username, *password, *email;
     FILE *user_db = fopen(USER_DB, "rb+");
 
     if (!user_db)
 	return 1;
 
-    // TODO: actually load into memory
+    // TODO: free current user tree
+
+    u_state.users = NULL;
+    u_state.n_users = 0;
+
+    len = *((ushort *) fgets(buffer, N_USERS_SIZE, user_db));
+    buffer = fgets(buffer, USER_HEADER_SIZE + USER_REGISTER_SIZE * len, user_db);
+
+    // seek first user register
+    buffer += USER_HEADER_SIZE;
+
+    while (user_db) {
+	active = *buffer == 0 ? 0 : 1;
+
+	// if user is active, load it to memory
+	// only happens if last operation was a deletion
+	if (active) {
+	    buffer += ACTIVE_SIZE;
+
+	    strcpy(username, buffer);
+	    buffer += USERNAME_SIZE;
+
+	    strcpy(password, buffer);
+	    buffer += PASSWORD_SIZE;
+
+	    strcpy(email, buffer);
+	    buffer += EMAIL_SIZE;
+
+	    if (add_user_node(u_state.users,username, password, email))
+		++u_state.n_users;
+	}
+	// move pointer one whole register
+	else
+	    buffer += USER_REGISTER_SIZE;
+    }
 
     fclose(user_db);
 
     return 0;
 }
 
-// insert user register
-unsigned int add_user(char *username, char *password, char *email) {
-    char *u_reg = calloc(1, USER_REGISTER_SIZE);
-    char *insert;
-    size_t length;
+// save users to disk
+char save_user_db() {
+    char *u_buffer = calloc(1, USER_HEADER_SIZE + USER_REGISTER_SIZE * u_state.n_users);
+    char *len_users = malloc(2);
+    unsigned char offset = 0;
+    size_t index = 0;
 
-    FILE *user_db = fopen(USER_DB, "ab+");
+    // write header to buffer
+    sprintf(len_users, "%u", u_state.n_users);
+    strdmps(u_buffer, len_users, N_USERS_SIZE);
+
+    // iterate over suffix tree and insert user data
+    user_trie_dump(u_state.users, u_buffer, &index);
+
+    FILE *user_db = fopen(USER_DB, "wb+");
 
     if (!user_db)
 	return 1;
 
-    // insert active as 1
-    strdmpc(u_reg, '\xff');
-    unsigned char offset = 1;
+    fwrite(u_buffer, USER_HEADER_SIZE + USER_REGISTER_SIZE * u_state.n_users, 1, user_db);
 
-    // insert previous and next user pointers
-    insert = "\x0\x0\x0\x0";
-    strdmps(u_reg + offset, insert, POINTER_SIZE);
-    offset += POINTER_SIZE;
+    return 0;
+};
 
-    strdmps(u_reg + offset, insert, POINTER_SIZE);
-    offset += POINTER_SIZE;
+// insert user register
+unsigned int add_user(char *username, char *password, char *email) {
+    // user already exists
+    if (is_user(u_state.users, username))
+	return 1;
 
-    // insert user data
-    length = min(strlen(username), USERNAME_SIZE);
-    strdmps(u_reg + offset, username, length);
-    offset += USERNAME_SIZE;
+    // error adding user
+    if (!add_user_node(u_state.users, username, password, email))
+	return 2;
 
-    length = min(strlen(password), PASSWORD_SIZE);
-    strdmps(u_reg + offset, password, length);
-    offset += PASSWORD_SIZE;
+    u_state.n_users++;
 
-    length = min(strlen(email), EMAIL_SIZE);
-    strdmps(u_reg + offset, email, length);
-
-    fwrite(u_reg, USER_REGISTER_SIZE, 1, user_db) != 1;
-
-    fclose(user_db);
+    // error saving database
+    if (save_user_db())
+	return 3;
 
     return 0;
 }
 
 // de-activate user register
-char rm_user(unsigned int reg) {
-    // TODO: update "hole"
-
-
+char rm_user(char *username) {
+    // TODO:
+    //	change user list in memory
+    //	write to disk
 
     return 0;
 }
