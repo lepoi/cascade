@@ -19,15 +19,38 @@ int main(int argc, char *args[]) {
 	    printf("Successfully initialized user databse\n");
     }
 
-    // open database and load into memory
-    if (error = load_user_db())
-	printf("Error %u while loading user databse, initializing DB...\n");
+    // initialize user state
+    init_user_state();
+
+    // load users from disk to memory
+    if (error = load_user_db()) {
+	printf("Error %u loading user databse, exiting...\n", error);
+	exit(1);
+    }
     else
 	printf("Successfully loaded user databse\n");
 
-    // anything else
-    // unsigned int a = add_user("poi??", "terminal??", "terminallyquack@gmail.com??", 0);
+    // print error info
+    //if (error = add_user("poi", "poi", "terminallyquack@gmail.com"))
+    //if (error = add_user("magda", "magda", "edgarmv97@gmail.com"))
+    if (error = add_user("alejanky", "janky", "alejanky@gmail.com"))
+	printf("Error registering user: ");
+    else
+	printf("Registered user\n");
+
+    switch (error) {
+	case 1:
+		printf("Username already exists\n");
+		break;
+	case 2:
+		printf("Error adding user node\n");
+		break;
+	case 3:
+		printf("Error saving user database\n");
+		break;
+	default: break;
+    };
 
     return 0;
-}
+};
 

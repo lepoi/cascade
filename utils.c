@@ -8,18 +8,18 @@
 void strdmps(char *dest, char *source, unsigned int length) {
     while (length--)
 	*dest++ = *source++;
-}
+};
 
 // dump char to char * (redundant)
 void strdmpc(char *dest, char source) {
     *dest = source;
-}
+};
 
 // dump char * memory block to stdout
 void stddmp(char *source, unsigned int length) {
     while (length--)
 	putc(*source++, stdout);
-}
+};
 
 // dump char * memory block to stdout, formatted as hex
 void stddmpx(char *source, unsigned int length) {
@@ -27,7 +27,7 @@ void stddmpx(char *source, unsigned int length) {
 	printf("%02x.", *source++);
 
     printf("\n");
-}
+};
 
 // dump char * memory block to file
 void fdmps(FILE *dest, char *source, unsigned int length) {
@@ -37,5 +37,5 @@ void fdmps(FILE *dest, char *source, unsigned int length) {
     	fwrite(source++, 1, 1, dest);
 	// putc(*source++, dest);
     }
-}
+};
 

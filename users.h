@@ -5,8 +5,6 @@
 #define N_USERS_SIZE 2
 
 #define USER_REGISTER_SIZE 100
-#define ACTIVE_SIZE 1
-// #define POINTER_SIZE 4
 #define USERNAME_SIZE 20
 #define PASSWORD_SIZE 20
 #define EMAIL_SIZE 60
@@ -19,8 +17,10 @@ struct user_state {
     struct user_trie *users;
 };
 
+struct user_state u_state;
+
 // initialize state for this module
-struct user_state u_state = { 0, new_user_node_empty() };
+void init_user_state();
 
 // initialize database file
 char init_user_db();
@@ -32,6 +32,6 @@ char load_user_db();
 char save_user_db();
 
 // database operations
-unsigned int add_user(char *username, char *password, char *email);
+char add_user(char *username, char *password, char *email);
 char rm_user(char *username);
 
