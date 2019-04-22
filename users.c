@@ -1,4 +1,5 @@
 #include "users.h"
+#include "sessions.c"
 
 void init_user_state() {
     u_state.n_users = 0;
@@ -36,7 +37,7 @@ char load_user_db() {
     if (!user_db)
 	return 1;
 
-    // TODO: free current user tree
+    // TODO: free user tree
 
     buffer = (char *) malloc(N_USERS_SIZE);
     pointer = buffer;
@@ -47,7 +48,6 @@ char load_user_db() {
     if (!(len = *buffer))
 	return 0;
 
-    // TODO: test with registered users
     if (fgets(buffer, USER_REGISTER_SIZE * len + 1, user_db) == NULL)
 	return 1;
 
@@ -76,8 +76,6 @@ char load_user_db() {
 
 // save users to disk
 char save_user_db() {
-    printf("save_user_db 0 (len: %u)\n", u_state.n_users);
-
     char *u_buffer = calloc(1, USER_HEADER_SIZE + USER_REGISTER_SIZE * u_state.n_users);
     ushort *n_users = (ushort *) u_buffer;
     char error, offset = 0;
@@ -90,23 +88,16 @@ char save_user_db() {
     // write header to buffer
     *n_users = u_state.n_users;
 
-    // iterate over suffix tree and insert user data
+    // iterate over trie and insert user data
     user_trie_dump(u_state.users, u_buffer + USER_HEADER_SIZE, &index);
 
-    printf("save_user_db 1\n");
-
-    stddmpx(u_buffer, USER_HEADER_SIZE + USER_REGISTER_SIZE * u_state.n_users);
     fwrite(u_buffer, USER_HEADER_SIZE + USER_REGISTER_SIZE * u_state.n_users, 1, user_db);
-
-    printf("save_user_db 2\n");
 
     free(n_users);
     free(u_buffer);
 
     error = ferror(user_db);
     fclose(user_db);
-
-    printf("save_user_db 3\n");
 
     return error;
 };

@@ -25,7 +25,7 @@ void init_user_state();
 // initialize database file
 char init_user_db();
 
-// load existing databse file to memory
+// load existing database file to memory
 char load_user_db();
 
 // save user tree to disk

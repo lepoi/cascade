@@ -58,7 +58,6 @@ struct user_trie *add_user_node(struct user_trie *root, char *username, char *pa
 
     for (char i = 0; i < len; ++i) {
 	index = *(username + i) - 'a';
-	printf("index: %u\n", index);
 
 	if (!root->children[index])
 	    root->children[index] = new_user_node_empty();
@@ -69,8 +68,6 @@ struct user_trie *add_user_node(struct user_trie *root, char *username, char *pa
 
     root->children[index] = new_user_node(username, password, email);
     root = root->children[index];
-
-    printf("added: %s %s %s\n", root->username, root->password, root->email);
 
     return root;
 };
@@ -109,8 +106,6 @@ void user_trie_dump(struct user_trie *root, char *buffer, size_t *index) {
 
     // insert user
     if (root->username) {
-	printf("dump: %s %s %s on index %u\n", root->username, root->password, root->email, *index);
-
 	strdmps(buffer, root->username, strlen(root->username));
 	buffer += USERNAME_SIZE;
 
